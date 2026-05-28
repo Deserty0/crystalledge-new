@@ -4,19 +4,20 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._CE.StatusEffects.Core.Components;
 
 /// <summary>
-/// Changes alert on stack
+/// Shows alerts based on effect stack
 /// </summary>
 [RegisterComponent]
 public sealed partial class CEStatusEffectAlertOnStackComponent : Component
 {
     /// <summary>
-    /// Category of alerts
+    /// Category of showed alerts
     /// </summary>
     [DataField(required: true)]
     public ProtoId<AlertCategoryPrototype> AlertsCategory;
 
     /// <summary>
     /// Stack: Alert
+    /// Leave alert null if you don't want to show any alert
     /// Alerts must be in same group
     /// </summary>
     [DataField(required: true)]
