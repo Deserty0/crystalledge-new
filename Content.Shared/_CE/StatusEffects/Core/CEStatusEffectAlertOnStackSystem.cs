@@ -9,7 +9,7 @@ using Robust.Shared.Timing;
 namespace Content.Shared._CE.StatusEffects.Core;
 
 /// <summary>
-/// Changes status effect alert
+/// Changes additional status effect alert
 /// </summary>
 public sealed class CEStatusEffectAlertOnStackSystem : EntitySystem
 {
