@@ -4,24 +4,23 @@ using Content.Shared._CE.StatusEffects.Core.Components;
 using Content.Shared.Alert;
 using Content.Shared.StatusEffectNew;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Timing;
 
 namespace Content.Shared._CE.StatusEffects.Core;
 
 /// <summary>
 /// Changes additional status effect alert
 /// </summary>
-public sealed class CEStatusEffectAlertOnStackSystem : EntitySystem
+public sealed class CEStatusEffectStackAlertSystem : EntitySystem
 {
     [Dependency] private readonly AlertsSystem _alerts = default!;
 
     public override void Initialize()
     {
-        SubscribeLocalEvent<CEStatusEffectAlertOnStackComponent, CEStatusEffectEndingAttemptEvent>(OnBeforeEnded, after: [typeof(CEStatusEffectStackSystem)]);
-        SubscribeLocalEvent<CEStatusEffectAlertOnStackComponent, CEStatusEffectStackEditedEvent>(OnStatusEffectStackChange);
+        SubscribeLocalEvent<CEStatusEffectStackAlertComponent, CEStatusEffectEndingAttemptEvent>(OnBeforeEnded, after: [typeof(CEStatusEffectStackSystem)]);
+        SubscribeLocalEvent<CEStatusEffectStackAlertComponent, CEStatusEffectStackEditedEvent>(OnStatusEffectStackChange);
     }
 
-    private void OnBeforeEnded(Entity<CEStatusEffectAlertOnStackComponent> ent,
+    private void OnBeforeEnded(Entity<CEStatusEffectStackAlertComponent> ent,
         ref CEStatusEffectEndingAttemptEvent args)
     {
         if (args.Cancelled)
@@ -30,7 +29,7 @@ public sealed class CEStatusEffectAlertOnStackSystem : EntitySystem
         _alerts.ClearAlertCategory(args.Target, ent.Comp.AlertsCategory);
     }
 
-    private void OnStatusEffectStackChange(Entity<CEStatusEffectAlertOnStackComponent> ent, ref CEStatusEffectStackEditedEvent args)
+    private void OnStatusEffectStackChange(Entity<CEStatusEffectStackAlertComponent> ent, ref CEStatusEffectStackEditedEvent args)
     {
         if (!TryGetAlertByStack(args.NewStack, ent.Comp, out var alert))
         {
@@ -43,7 +42,7 @@ public sealed class CEStatusEffectAlertOnStackSystem : EntitySystem
 
     private bool TryGetAlertByStack(
         int stack,
-        CEStatusEffectAlertOnStackComponent comp,
+        CEStatusEffectStackAlertComponent comp,
         [NotNullWhen(true)] out ProtoId<AlertPrototype>? alert)
     {
         alert = null;

@@ -7,7 +7,7 @@ namespace Content.Shared._CE.StatusEffects.Core.Components;
 /// Shows alerts based on effect stack
 /// </summary>
 [RegisterComponent]
-public sealed partial class CEStatusEffectAlertOnStackComponent : Component
+public sealed partial class CEStatusEffectStackAlertComponent : Component
 {
     /// <summary>
     /// Category of showed alerts
