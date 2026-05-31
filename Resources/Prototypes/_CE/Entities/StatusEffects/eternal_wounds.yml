@@ -1,0 +1,41 @@
+- type: entity
+  id: CEStatusEffectEternalWounds
+  name: Eternal wounds
+  components:
+  - type: StatusEffect
+  - type: RejuvenateRemovedStatusEffect
+  - type: CEStatusEffectStack
+  - type: StatusEffectAlert
+    alert: CEEternalWounds
+  - type: CEChangeMaxHpStatusEffect
+    hpMultiplierChangePerStack: -0.02 # well i guess it enough to be what-the-fuck effect
+
+- type: alert
+  id: CEEternalWounds
+  icons:
+  - sprite: _CE/Interface/arayashiki_effect.rsi
+    state: eternal wounds
+  alertViewEntity: CEEternalWoundsSpriteView
+
+- type: entity
+  id: CEEternalWoundsSpriteView
+  categories:
+  - HideSpawnMenu
+  components:
+  - type: Sprite
+    sprite: Interface/Alerts/essence_counter.rsi
+    layers:
+    - sprite: _CE/Interface/arayashiki_effect.rsi
+      state: eternal wounds
+    - offset: 0.65, 0
+      map:
+      - "1"
+    - offset: 0.45, 0
+      map:
+      - "10"
+    - offset: 0.25, 0
+      map:
+      - "100"
+  - type: GenericCounterAlert
+    centerGlyph: false
+
