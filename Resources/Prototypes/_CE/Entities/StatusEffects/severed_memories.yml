@@ -1,0 +1,69 @@
+- type: entity
+  id: CEStatusEffectSeveredMemories
+  name: Severed memories
+  components:
+  - type: StatusEffect
+  - type: RejuvenateRemovedStatusEffect
+  - type: CEStatusEffectStack
+  - type: StatusEffectAlert
+    alert: CESeveredMemories
+  - type: CEStatusEffectAlertOnStack
+    alertsCategory: CEStatusEffectSeveredMemories
+    alerts:
+      "20": CESeveredMemories20
+      "60": CESeveredMemories60
+      "90": CESeveredMemories90
+
+- type: alert
+  id: CESeveredMemories
+  icons:
+  - sprite: _CE/Interface/arayashiki_effect.rsi
+    state: severed memories
+  alertViewEntity: CESeveredMemoriesSpriteView
+
+- type: entity
+  id: CESeveredMemoriesSpriteView
+  categories:
+  - HideSpawnMenu
+  components:
+  - type: Sprite
+    sprite: Interface/Alerts/essence_counter.rsi
+    layers:
+    - sprite: _CE/Interface/arayashiki_effect.rsi
+      state: severed memories
+    - offset: 0.65, 0
+      map:
+      - "1"
+    - offset: 0.45, 0
+      map:
+      - "10"
+    - offset: 0.25, 0
+      map:
+      - "100"
+  - type: GenericCounterAlert
+    centerGlyph: false
+
+- type: alertCategory
+  id: CEStatusEffectSeveredMemories
+
+- type: alert
+  id: CESeveredMemories20
+  icons:
+  - sprite: _CE/Interface/arayashiki_effect.rsi
+    state: loosing skills
+  category: CEStatusEffectSeveredMemories
+
+- type: alert
+  id: CESeveredMemories60
+  icons:
+  - sprite: _CE/Interface/arayashiki_effect.rsi
+    state: mind superposition
+  category: CEStatusEffectSeveredMemories
+
+- type: alert
+  id: CESeveredMemories90
+  icons:
+  - sprite: _CE/Interface/arayashiki_effect.rsi
+    state: muga
+  category: CEStatusEffectSeveredMemories
+

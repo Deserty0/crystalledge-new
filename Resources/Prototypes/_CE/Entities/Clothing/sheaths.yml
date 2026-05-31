@@ -1,0 +1,17 @@
+- type: entity
+  id: CEClothingBaseSheathNeck
+  name: sheath
+  description: TODO
+  categories:
+  - ForkFiltered
+  parent: Clothing
+  abstract: true
+  components:
+  - type: Sprite
+    state: icon
+  - type: Clothing
+    slots:
+    - neck
+    equipDelay: 1s
+    unequipDelay: 1s
+    equipWhileMoving: true
