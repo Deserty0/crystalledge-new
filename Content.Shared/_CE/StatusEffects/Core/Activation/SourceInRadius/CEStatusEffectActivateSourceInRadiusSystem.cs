@@ -9,6 +9,7 @@ namespace Content.Shared._CE.StatusEffects.Core.Activation.SourceInRadius;
 /// </summary>
 public sealed class CEStatusEffectActivateSourceInRadiusSystem : EntitySystem
 {
+    [Dependency] private CEStatusEffectStackSystem _stackSystem = default!;
     public override void Initialize()
     {
 
@@ -20,13 +21,23 @@ public sealed class CEStatusEffectActivateSourceInRadiusSystem : EntitySystem
 
         var query = EntityQueryEnumerator<CEStatusEffectActivateSourceInRadiusComponent, CEStatusEffectActivatableComponent, CEStatusEffectSourceComponent, StatusEffectComponent>();
 
-        while (query.MoveNext(out _,
+        while (query.MoveNext(out var ent,
                    out var radiusComponent,
                    out var activatableComponent,
                    out var sourceComponent,
                    out var statusEffectComponent))
         {
-            
+            var source = _stackSystem.GetSource((ent, sourceComponent));
+
+            if (source is null)
+            {
+                if (!activatableComponent.Active)
+                    continue;
+
+
+            }
+
+
         }
     }
 }

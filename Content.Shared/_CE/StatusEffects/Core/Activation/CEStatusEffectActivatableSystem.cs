@@ -32,3 +32,9 @@ public sealed class CEStatusEffectActivatableSystem : EntitySystem
         }
     }
 }
+
+[ByRefEvent]
+public record struct CEToggleStatusEffectEvent(
+    Entity<CEStatusEffectActivatableComponent> Effect,
+    EntityUid Target,
+    bool State);
