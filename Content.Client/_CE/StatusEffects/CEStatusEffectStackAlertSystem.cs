@@ -2,7 +2,7 @@ using Content.Shared._CE.StatusEffects.Core.Components;
 using Content.Shared.Alert.Components;
 using Content.Shared.StatusEffectNew.Components;
 
-namespace Content.Client._CE.StatusEffectStacks;
+namespace Content.Client._CE.StatusEffects;
 
 /// <summary>
 /// Client-side system that provides the current stack count to <see cref="GenericCounterAlertComponent"/>

@@ -3,7 +3,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
-namespace Content.Client._CE.StatusEffectVFX;
+namespace Content.Client._CE.StatusEffects;
 
 public sealed class CEStatusEffectVFXSystem : CESharedStatusEffectVFXSystem
 {

@@ -1,17 +1,15 @@
 ﻿using Content.Shared._CE.Health;
-using Content.Shared._CE.Health.Components;
 using Content.Shared._CE.Skill.Core;
 using Content.Shared._CE.Skill.Core.Components;
 using Content.Shared._CE.StatusEffects.Core;
 using Content.Shared._CE.StatusEffects.Core.Components;
-using Content.Shared.Fluids;
 using Content.Shared.StatusEffectNew.Components;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
 namespace Content.Shared._CE.StatusEffects.SeveredMemories;
 
-public sealed class CEStatusEffectSeveredMemoriesSystem : EntitySystem
+public abstract partial class CESharedStatusEffectSeveredMemoriesSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly CESharedDamageableSystem _damage = default!;
@@ -50,7 +48,6 @@ public sealed class CEStatusEffectSeveredMemoriesSystem : EntitySystem
         ref CEStatusEffectStackEditedEvent args)
     {
         LooseSkills(ent, args.NewStack, args.Target);
-
     }
 
     private void LooseSkills(Entity<CEStatusEffectSeveredMemoriesComponent> ent, int stack, EntityUid target)
