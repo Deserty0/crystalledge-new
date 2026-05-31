@@ -297,7 +297,6 @@ namespace Content.Shared.Examine
     /// </summary>
     public sealed class ExaminedEvent : EntityEventArgs
     {
-        //CrystallEdge: added setter to change message via CEChangeMessage
         /// <summary>
         ///     The message that will be displayed as the examine text.
         ///     You should use <see cref="PushMarkup"/> and similar instead to modify this,
@@ -309,7 +308,7 @@ namespace Content.Shared.Examine
         /// <seealso cref="AddMessage"/>
         /// <seealso cref="AddMarkup"/>
         /// <seealso cref="AddText"/>
-        private FormattedMessage Message { get; set; }
+        private FormattedMessage Message { get; }
 
         /// <summary>
         ///     Parts of the examine message that will later be sorted by priority and pushed onto <see cref="Message"/>.
@@ -514,23 +513,6 @@ namespace Content.Shared.Examine
             var msg = new FormattedMessage();
             msg.AddText(text);
             AddMessage(msg, priority);
-        }
-
-        /// <summary>
-        /// CrystallEdge: way to get og message
-        /// </summary>
-        public FormattedMessage CEGetMessage()
-        {
-            return Message;
-        }
-
-        /// <summary>
-        /// CrystallEdge: way to change og message
-        /// </summary>
-        /// <param name="newMessage"></param>
-        public void CEChangeMessage(FormattedMessage newMessage)
-        {
-            Message = newMessage;
         }
 
         public struct ExamineGroupDisposable : IDisposable
