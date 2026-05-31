@@ -13,6 +13,8 @@
       "20": CESeveredMemories20
       "60": CESeveredMemories60
       "90": CESeveredMemories90
+  - type: CEStatusEffectSeveredMemories
+    damageType: Physical
 
 - type: alert
   id: CESeveredMemories
