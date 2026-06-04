@@ -532,3 +532,58 @@
   id: 10046
   time: '2026-05-30T11:42:28.0000000+00:00'
   url: https://github.com/crystallpunk-14/crystalledge/pull/275
+- author: TheShuEd
+  changes:
+  - message: "The Warrior's \u201CStone Wall\u201D ability now knocks creatures up\
+      \ by 1 level."
+    type: Add
+  - message: Falling onto stone and ice spikes now deals additional heavy damage.
+    type: Add
+  - message: "The neutral skill \u201CJump\u201D has been added. Parkour is back."
+    type: Add
+  - message: Added 2 new passive abilities for the warrior.
+    type: Add
+  - message: "The Warrior's passive ability \u201CManeuverability\u201D has been removed."
+    type: Remove
+  - message: All fall damage is reduced by half.
+    type: Tweak
+  id: 10047
+  time: '2026-06-03T12:40:54.0000000+00:00'
+  url: https://github.com/crystallpunk-14/crystalledge/pull/279
+- author: TheShuEd
+  changes:
+  - message: Fixed an issue where players could drag mobs along with them
+    type: Fix
+  - message: Fixed an issue where players could jump while in mid-air
+    type: Fix
+  id: 10048
+  time: '2026-06-03T16:43:57.0000000+00:00'
+  url: https://github.com/crystallpunk-14/crystalledge/pull/281
+- author: TheShuEd
+  changes:
+  - message: "A new active ability for the Knight, \u201CStone's Blink,\u201D has\
+      \ been added. It instantly applies a new petrification status effect to the\
+      \ user, granting sturdy shields and immobilizing them."
+    type: Add
+  - message: Creatures affected by freeze and petrification effects now cause a shockwave
+      when they fall from a height. Freeze and repulsion effects correspondingly.
+    type: Add
+  - message: Fixed bugs related to jumping and fall effects that were not working
+      properly on certain z-levels
+    type: Fix
+  id: 10049
+  time: '2026-06-04T11:55:21.0000000+00:00'
+  url: https://github.com/crystallpunk-14/crystalledge/pull/282
+- author: TheShuEd
+  changes:
+  - message: "A new active ability for the warrior, \u201CPetrifying Strike,\u201D\
+      \ has been added."
+    type: Add
+  - message: "A new passive ability for the Warrior, \u201CStone Trap,\u201D has been\
+      \ added\u2014it creates stone spikes around targets you have turned to stone"
+    type: Add
+  - message: "The warrior's active ability \u201CCruelty\u201D has been removed."
+    type: Remove
+  id: 10050
+  time: '2026-06-04T13:57:34.0000000+00:00'
+  url: https://github.com/crystallpunk-14/crystalledge/pull/283

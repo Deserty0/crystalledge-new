@@ -109,7 +109,7 @@ public sealed partial class CEZPhysicsComponent : Component
     [DataField]
     public float SleepTimer;
 
-    [DataField]
+    [ViewVariables]
     public bool Sleeping;
 
     [DataField]

@@ -1,0 +1,129 @@
+- type: skill
+  parent: BaseKnightSkill
+  id: PetrifyingStrike
+  effect: !type:AddAction
+    action: CEActionSpellPetrifyingStrike
+
+- type: entity
+  id: CEActionSpellPetrifyingStrike
+  parent: CEActionSpellBase
+  name: Petrifying Strike
+  description: Your next melee attack applies [color=#8b7355]5 Petrification[/color] stacks, immobilizing the target.
+  components:
+  - type: CEActionManaCost
+    manaCost: 10
+  - type: CEActionStaminaCost
+    cost: 2
+  - type: CEActionWeaponRequired
+  - type: Action
+    useDelay: 10
+    icon:
+      sprite: _CE/Skills/todo.rsi #TODO
+      state: icon
+  - type: InstantAction
+    event: !type:CEInstantActionAnimationEvent
+      animation: AnimationPetrifyingStrike
+
+- type: entityEffectAnimation
+  id: AnimationPetrifyingStrike
+  movementSpeed: 0.5
+  duration: 1
+  events:
+    0:
+    - !type:PlaySound
+      sound:
+        path: /Audio/Magic/rumble.ogg
+    - !type:ActiveHandEntityAnimation
+      offsetAnimation:
+      - time: 0
+        offset: -0, -0.3
+        easing: QuadIn
+      - time: 0.4
+        offset: -0.5, -0.2
+      - time: 0.8
+        offset: -0.5, 0.1
+        easing: QuadOut
+      rotationAnimation:
+      - time: 0
+        rotation: 90
+        easing: QuadIn
+      - time: 0.4
+        rotation: -30
+      - time: 0.8
+        rotation: -90
+        easing: QuadOut
+      colorAnimation:
+        - time: 0.9
+          color: "#976629"
+        - time: 1
+          color: "#8b735501"
+    0.6:
+    - !type:UsedEntityAnimation
+      dummyEntity: CEEffectPetrifyingStrikeTelegraphy
+      offsetAnimation:
+      - time: 0
+        offset: -0.6, 0.1
+    - !type:ApplyStatusEffectStack
+      effectTarget: User
+      statusEffect: CEStatusEffectPetrifyingStrike
+
+- type: entity
+  id: CEEffectPetrifyingStrikeTelegraphy
+  parent: CEBaseMagicImpact
+  categories: [ ForkFiltered ]
+  suffix: VFX
+  name: petrifying strike
+  save: false
+  components:
+  - type: Sprite
+    drawdepth: Effects
+    sprite: _CE/Structures/Nature/ice_rock.rsi
+    layers:
+    - state: smol
+      shader: unshaded
+      color: "#8b7355"
+  - type: PointLight
+    color: "#7a5c2e"
+    radius: 1.5
+  - type: TimedDespawn
+    lifetime: 1.5
+  - type: LightBehaviour
+    behaviours:
+      - !type:PulseBehaviour
+        interpolate: Linear
+        maxDuration: 1.5
+        startValue: 0
+        endValue: 3.0
+        property: Energy
+        isLooped: false
+        enabled: true
+
+- type: entity
+  id: CEStatusEffectPetrifyingStrike
+  name: Petrifying Strike
+  description: Your next melee attack applies [color=#8b7355]5 Petrification[/color] stacks, immobilizing the target.
+  components:
+  - type: StatusEffect
+  - type: CEStatusEffectStack
+    baseDuration: 10
+  - type: StatusEffectAlert
+    alert: CEPetrifyingStrike
+  - type: CEEffectOnAttackStatusEffect
+    stackCost: 1
+    effects:
+    - !type:ApplyStatusEffectStack
+      statusEffect: CEStatusEffectPetrification
+      amount: 5
+    - !type:ShockWaveVFX
+      effectTarget: Target
+      width: 0.1
+    - !type:SpawnEntity
+      effectTarget: Target
+      spawns:
+      - CEDustTileEffect
+
+- type: alert
+  id: CEPetrifyingStrike
+  icons:
+  - sprite: _CE/Structures/Nature/ice_rock.rsi #TODO
+    state: smol
