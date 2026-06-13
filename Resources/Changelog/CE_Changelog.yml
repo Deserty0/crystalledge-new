@@ -712,3 +712,18 @@
   id: 10062
   time: '2026-06-12T21:50:12.0000000+00:00'
   url: https://github.com/crystallpunk-14/crystalledge/pull/304
+- author: TheShuEd
+  changes:
+  - message: Added 2 new potions.
+    type: Add
+  - message: Accceleration potions buffed.
+    type: Tweak
+  - message: frost potion now apply frozen status effect on drinking instead slowdowning.
+    type: Tweak
+  - message: Fixed bug when mobs trying attacks dark souls.
+    type: Fix
+  - message: Fixed thrhowing vertical speed stacking.
+    type: Fix
+  id: 10063
+  time: '2026-06-13T16:30:48.0000000+00:00'
+  url: https://github.com/crystallpunk-14/crystalledge/pull/305
