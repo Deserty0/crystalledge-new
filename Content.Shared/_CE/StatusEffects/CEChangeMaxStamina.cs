@@ -9,8 +9,29 @@ namespace Content.Shared._CE.StatusEffects;
 [RegisterComponent, NetworkedComponent]
 public sealed partial class CEBonusStaminaComponent : Component
 {
+    /// <summary>
+    /// Changes max stamina by flat amount
+    /// </summary>
     [DataField]
-    public float FlatStaminaBonus = 10f;
+    public int FlatChange = 10;
+
+    /// <summary>
+    /// Changes max stamina by flat amount per stack
+    /// </summary>
+    [DataField]
+    public int FlatChangePerStack = 0;
+
+    /// <summary>
+    /// Changes max stamina by percent
+    /// </summary>
+    [DataField]
+    public float MultiplierChange = 0;
+
+    /// <summary>
+    /// Changes max stamina by percent per stack
+    /// </summary>
+    [DataField]
+    public float MultiplierChangePerStack = 0;
 }
 
 public sealed partial class CEBonusStaminaSystem : EntitySystem
@@ -49,6 +70,7 @@ public sealed partial class CEBonusStaminaSystem : EntitySystem
         if (TryComp<CEStatusEffectStackComponent>(ent, out var stackComp))
             stacks = stackComp.Stacks;
 
-        args.Args.FlatModifier += ent.Comp.FlatStaminaBonus * stacks;
+        args.Args.FlatModifier += ent.Comp.FlatChange + ent.Comp.FlatChangePerStack * stacks;
+        args.Args.Multiplier += ent.Comp.MultiplierChange + ent.Comp.MultiplierChangePerStack * stacks;
     }
 }

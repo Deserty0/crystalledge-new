@@ -9,8 +9,29 @@ namespace Content.Shared._CE.StatusEffects;
 [RegisterComponent, NetworkedComponent]
 public sealed partial class CEBonusManaComponent : Component
 {
+    /// <summary>
+    /// Changes max mana by flat amount
+    /// </summary>
     [DataField]
-    public int FlatManaBonus = 10;
+    public int FlatChange = 10;
+
+    /// <summary>
+    /// Changes max mana by flat amount per stack
+    /// </summary>
+    [DataField]
+    public int FlatChangePerStack = 0;
+
+    /// <summary>
+    /// Changes max mana by percent
+    /// </summary>
+    [DataField]
+    public float MultiplierChange = 0;
+
+    /// <summary>
+    /// Changes max mana by percent per stack
+    /// </summary>
+    [DataField]
+    public float MultiplierChangePerStack = 0;
 }
 
 public sealed partial class CEBonusManaSystem : EntitySystem
@@ -49,6 +70,7 @@ public sealed partial class CEBonusManaSystem : EntitySystem
         if (TryComp<CEStatusEffectStackComponent>(ent, out var stackComp))
             stacks = stackComp.Stacks;
 
-        args.Args.FlatModifier += ent.Comp.FlatManaBonus * stacks;
+        args.Args.FlatModifier += ent.Comp.FlatChange + ent.Comp.FlatChangePerStack * stacks;
+        args.Args.Multiplier += ent.Comp.MultiplierChange + ent.Comp.MultiplierChangePerStack * stacks;
     }
 }
