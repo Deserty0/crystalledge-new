@@ -7,7 +7,7 @@ using Robust.Shared.GameStates;
 namespace Content.Shared._CE.StatusEffects;
 
 [RegisterComponent, NetworkedComponent]
-public sealed partial class CEBonusHealthComponent : Component
+public sealed partial class CEChangeMaxHealthComponent : Component
 {
     /// <summary>
     /// Changes max health by flat amount
@@ -34,7 +34,7 @@ public sealed partial class CEBonusHealthComponent : Component
     public float MultiplierChangePerStack = 0;
 }
 
-public sealed partial class CEBonusHealthSystem : EntitySystem
+public sealed partial class CEChangeMaxHealthSystem : EntitySystem
 {
     [Dependency] private CEMobStateSystem _mobState = default!;
 
@@ -42,28 +42,28 @@ public sealed partial class CEBonusHealthSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<CEBonusHealthComponent, StatusEffectAppliedEvent>(OnApply);
-        SubscribeLocalEvent<CEBonusHealthComponent, StatusEffectRemovedEvent>(OnRemoved);
-        SubscribeLocalEvent<CEBonusHealthComponent, CEStatusEffectStackEditedEvent>(OnStackEdited);
-        SubscribeLocalEvent<CEBonusHealthComponent, StatusEffectRelayedEvent<CECalculateMaxHealthEvent>>(OnCalculateMaxHealth);
+        SubscribeLocalEvent<CEChangeMaxHealthComponent, StatusEffectAppliedEvent>(OnApply);
+        SubscribeLocalEvent<CEChangeMaxHealthComponent, StatusEffectRemovedEvent>(OnRemoved);
+        SubscribeLocalEvent<CEChangeMaxHealthComponent, CEStatusEffectStackEditedEvent>(OnStackEdited);
+        SubscribeLocalEvent<CEChangeMaxHealthComponent, StatusEffectRelayedEvent<CECalculateMaxHealthEvent>>(OnCalculateMaxHealth);
     }
 
-    private void OnApply(Entity<CEBonusHealthComponent> ent, ref StatusEffectAppliedEvent args)
+    private void OnApply(Entity<CEChangeMaxHealthComponent> ent, ref StatusEffectAppliedEvent args)
     {
         _mobState.RefreshMaxHealth(args.Target);
     }
 
-    private void OnRemoved(Entity<CEBonusHealthComponent> ent, ref StatusEffectRemovedEvent args)
+    private void OnRemoved(Entity<CEChangeMaxHealthComponent> ent, ref StatusEffectRemovedEvent args)
     {
         _mobState.RefreshMaxHealth(args.Target);
     }
 
-    private void OnStackEdited(Entity<CEBonusHealthComponent> ent, ref CEStatusEffectStackEditedEvent args)
+    private void OnStackEdited(Entity<CEChangeMaxHealthComponent> ent, ref CEStatusEffectStackEditedEvent args)
     {
         _mobState.RefreshMaxHealth(args.Target);
     }
 
-    private void OnCalculateMaxHealth(Entity<CEBonusHealthComponent> ent,
+    private void OnCalculateMaxHealth(Entity<CEChangeMaxHealthComponent> ent,
         ref StatusEffectRelayedEvent<CECalculateMaxHealthEvent> args)
     {
         var stacks = 1;

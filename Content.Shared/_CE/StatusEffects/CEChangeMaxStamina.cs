@@ -7,7 +7,7 @@ using Robust.Shared.GameStates;
 namespace Content.Shared._CE.StatusEffects;
 
 [RegisterComponent, NetworkedComponent]
-public sealed partial class CEBonusStaminaComponent : Component
+public sealed partial class CEChangeMaxStaminaComponent : Component
 {
     /// <summary>
     /// Changes max stamina by flat amount
@@ -34,7 +34,7 @@ public sealed partial class CEBonusStaminaComponent : Component
     public float MultiplierChangePerStack = 0;
 }
 
-public sealed partial class CEBonusStaminaSystem : EntitySystem
+public sealed partial class CEChangeMaxStaminaSystem : EntitySystem
 {
     [Dependency] private CEStaminaSystem _stamina = default!;
 
@@ -42,28 +42,28 @@ public sealed partial class CEBonusStaminaSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<CEBonusStaminaComponent, StatusEffectAppliedEvent>(OnApply);
-        SubscribeLocalEvent<CEBonusStaminaComponent, StatusEffectRemovedEvent>(OnRemoved);
-        SubscribeLocalEvent<CEBonusStaminaComponent, CEStatusEffectStackEditedEvent>(OnStackEdited);
-        SubscribeLocalEvent<CEBonusStaminaComponent, StatusEffectRelayedEvent<CECalculateMaxStaminaEvent>>(OnCalculateMaxStamina);
+        SubscribeLocalEvent<CEChangeMaxStaminaComponent, StatusEffectAppliedEvent>(OnApply);
+        SubscribeLocalEvent<CEChangeMaxStaminaComponent, StatusEffectRemovedEvent>(OnRemoved);
+        SubscribeLocalEvent<CEChangeMaxStaminaComponent, CEStatusEffectStackEditedEvent>(OnStackEdited);
+        SubscribeLocalEvent<CEChangeMaxStaminaComponent, StatusEffectRelayedEvent<CECalculateMaxStaminaEvent>>(OnCalculateMaxStamina);
     }
 
-    private void OnApply(Entity<CEBonusStaminaComponent> ent, ref StatusEffectAppliedEvent args)
+    private void OnApply(Entity<CEChangeMaxStaminaComponent> ent, ref StatusEffectAppliedEvent args)
     {
         _stamina.RefreshMaxStamina(args.Target);
     }
 
-    private void OnRemoved(Entity<CEBonusStaminaComponent> ent, ref StatusEffectRemovedEvent args)
+    private void OnRemoved(Entity<CEChangeMaxStaminaComponent> ent, ref StatusEffectRemovedEvent args)
     {
         _stamina.RefreshMaxStamina(args.Target);
     }
 
-    private void OnStackEdited(Entity<CEBonusStaminaComponent> ent, ref CEStatusEffectStackEditedEvent args)
+    private void OnStackEdited(Entity<CEChangeMaxStaminaComponent> ent, ref CEStatusEffectStackEditedEvent args)
     {
         _stamina.RefreshMaxStamina(args.Target);
     }
 
-    private void OnCalculateMaxStamina(Entity<CEBonusStaminaComponent> ent,
+    private void OnCalculateMaxStamina(Entity<CEChangeMaxStaminaComponent> ent,
         ref StatusEffectRelayedEvent<CECalculateMaxStaminaEvent> args)
     {
         var stacks = 1;

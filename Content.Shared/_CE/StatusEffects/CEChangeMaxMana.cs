@@ -7,7 +7,7 @@ using Robust.Shared.GameStates;
 namespace Content.Shared._CE.StatusEffects;
 
 [RegisterComponent, NetworkedComponent]
-public sealed partial class CEBonusManaComponent : Component
+public sealed partial class CEChangeMaxManaComponent : Component
 {
     /// <summary>
     /// Changes max mana by flat amount
@@ -34,7 +34,7 @@ public sealed partial class CEBonusManaComponent : Component
     public float MultiplierChangePerStack = 0;
 }
 
-public sealed partial class CEBonusManaSystem : EntitySystem
+public sealed partial class CEChangeMaxManaSystem : EntitySystem
 {
     [Dependency] private CESharedMagicEnergySystem _mana = default!;
 
@@ -42,28 +42,28 @@ public sealed partial class CEBonusManaSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<CEBonusManaComponent, StatusEffectAppliedEvent>(OnApply);
-        SubscribeLocalEvent<CEBonusManaComponent, StatusEffectRemovedEvent>(OnRemoved);
-        SubscribeLocalEvent<CEBonusManaComponent, CEStatusEffectStackEditedEvent>(OnStackEdited);
-        SubscribeLocalEvent<CEBonusManaComponent, StatusEffectRelayedEvent<CECalculateMaxManaEvent>>(OnCalculateMaxMana);
+        SubscribeLocalEvent<CEChangeMaxManaComponent, StatusEffectAppliedEvent>(OnApply);
+        SubscribeLocalEvent<CEChangeMaxManaComponent, StatusEffectRemovedEvent>(OnRemoved);
+        SubscribeLocalEvent<CEChangeMaxManaComponent, CEStatusEffectStackEditedEvent>(OnStackEdited);
+        SubscribeLocalEvent<CEChangeMaxManaComponent, StatusEffectRelayedEvent<CECalculateMaxManaEvent>>(OnCalculateMaxMana);
     }
 
-    private void OnApply(Entity<CEBonusManaComponent> ent, ref StatusEffectAppliedEvent args)
+    private void OnApply(Entity<CEChangeMaxManaComponent> ent, ref StatusEffectAppliedEvent args)
     {
         _mana.RefreshMaxMana(args.Target);
     }
 
-    private void OnRemoved(Entity<CEBonusManaComponent> ent, ref StatusEffectRemovedEvent args)
+    private void OnRemoved(Entity<CEChangeMaxManaComponent> ent, ref StatusEffectRemovedEvent args)
     {
         _mana.RefreshMaxMana(args.Target);
     }
 
-    private void OnStackEdited(Entity<CEBonusManaComponent> ent, ref CEStatusEffectStackEditedEvent args)
+    private void OnStackEdited(Entity<CEChangeMaxManaComponent> ent, ref CEStatusEffectStackEditedEvent args)
     {
         _mana.RefreshMaxMana(args.Target);
     }
 
-    private void OnCalculateMaxMana(Entity<CEBonusManaComponent> ent,
+    private void OnCalculateMaxMana(Entity<CEChangeMaxManaComponent> ent,
         ref StatusEffectRelayedEvent<CECalculateMaxManaEvent> args)
     {
         var stacks = 1;
