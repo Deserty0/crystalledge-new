@@ -10,25 +10,25 @@ namespace Content.Shared._CE.StatusEffects;
 public sealed partial class CEChangeMaxStaminaComponent : Component
 {
     /// <summary>
-    /// Changes max stamina by flat amount
+    /// Changes max health by flat amount (can be negative)
     /// </summary>
     [DataField]
     public int FlatChange = 10;
 
     /// <summary>
-    /// Changes max stamina by flat amount per stack
+    /// Changes max health by flat amount per stack (can be negative)
     /// </summary>
     [DataField]
     public int FlatChangePerStack = 0;
 
     /// <summary>
-    /// Changes max stamina by percent
+    /// Added to global multiplier (can be negative)
     /// </summary>
     [DataField]
     public float MultiplierChange = 0;
 
     /// <summary>
-    /// Changes max stamina by percent per stack
+    /// Added to global multiplier per stack (can be negative)
     /// </summary>
     [DataField]
     public float MultiplierChangePerStack = 0;
