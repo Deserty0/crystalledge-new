@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using Content.Shared._CE.Procedural;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
@@ -11,11 +11,11 @@ namespace Content.Client._CE.Procedural;
 /// Debug overlay that visualizes <see cref="CEGeneratingProceduralDungeonComponent"/> data:
 /// draws coloured rectangles for each abstract room and lines for room connections.
 /// </summary>
-public sealed class CEProceduralGenerationOverlay : Overlay
+public sealed partial class CEProceduralGenerationOverlay : Overlay
 {
-    [Dependency] private readonly IEntityManager _entMan = default!;
-    [Dependency] private readonly IResourceCache _cache = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private IEntityManager _entMan = default!;
+    [Dependency] private IResourceCache _cache = default!;
+    [Dependency] private IPrototypeManager _proto = default!;
 
     public override OverlaySpace Space => OverlaySpace.WorldSpace | OverlaySpace.ScreenSpace;
 

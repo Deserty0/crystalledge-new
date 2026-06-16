@@ -1,4 +1,4 @@
-using Content.Shared._CE.TileEffects;
+﻿using Content.Shared._CE.TileEffects;
 using Content.Shared._CE.TileEffects.Core;
 using Robust.Shared.Prototypes;
 
@@ -31,13 +31,13 @@ public sealed partial class ApplyTileEffect : CEEntityEffectBase<ApplyTileEffect
 
 public sealed partial class CEApplyTileEffectSystem : CEEntityEffectSystem<ApplyTileEffect>
 {
-    [Dependency] private readonly CETileEffectSystem _tileEffect = default!;
+    [Dependency] private CETileEffectSystem _tileEffect = default!;
 
     protected override void Effect(ref CEEntityEffectEvent<ApplyTileEffect> args)
     {
         if (!TryResolveEffectCoordinates(args.Args, args.Effect.EffectTarget, out var coords))
             return;
 
-        _tileEffect.TryApplyTileEffect(args.Effect.TileEffect, args.Args.Source, coords, args.Effect.Amount, args.Effect.Max);
+        _tileEffect.TryApplyTileEffect(args.Effect.TileEffect, args.Args.Source, coords, Math.Max(1, (int)(args.Effect.Amount * args.Args.Power)), args.Effect.Max);
     }
 }

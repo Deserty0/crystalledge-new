@@ -110,9 +110,10 @@
       exploreRadius: 8
     # Move to enemy's last known position
   - type: CEGOAPCheckHealthLevelSensor
-    conditionKey: LowHealth
-    threshold: 0.6
-    selector: !type:CEGOAPSelectorSelf
+    entries:
+    - conditionKey: LowHealth
+      threshold: 0.6
+      selector: !type:CEGOAPSelectorSelf
 
   - type: NpcFactionMember
     factions:
@@ -139,10 +140,10 @@
     baseSprintSpeed: 4.5
   - type: CEWeapon
     spriteRotation: -90
+    range: 0.8
     effectSlots:
       OnHit:
       - !type:WeaponArcAttack
-        range: 0.8
         arcWidth: 40
         effects:
         - !type:Damage

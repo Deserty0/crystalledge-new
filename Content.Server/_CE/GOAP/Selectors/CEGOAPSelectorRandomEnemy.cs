@@ -1,6 +1,7 @@
-using Content.Server._CE.GOAP.Classifiers;
+﻿using Content.Server._CE.GOAP.Classifiers;
 using Content.Shared._CE.GOAP.Selectors;
 using Content.Shared._CE.Health;
+using Content.Shared._CE.Health.Components;
 using Robust.Shared.Random;
 
 namespace Content.Server._CE.GOAP.Selectors;
@@ -14,11 +15,12 @@ public sealed partial class CEGOAPSelectorRandomEnemy : CEGOAPTargetSelectorBase
 
 public sealed partial class CEGOAPSelectorRandomEnemySystem : CEGOAPTargetSelectorSystem<CEGOAPSelectorRandomEnemy>
 {
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly CEMobStateSystem _mobState = default!;
+    [Dependency] private IRobustRandom _random = default!;
+    [Dependency] private CEMobStateSystem _mobState = default!;
 
-    [Dependency] private readonly EntityQuery<TransformComponent> _xformQuery = default!;
-    [Dependency] private readonly EntityQuery<CEGOAPKnowledgeCacheComponent> _cacheQuery = default!;
+    [Dependency] private EntityQuery<TransformComponent> _xformQuery = default!;
+    [Dependency] private EntityQuery<CEGOAPKnowledgeCacheComponent> _cacheQuery = default!;
+    [Dependency] private EntityQuery<CEMobStateComponent> _mobStateQuery = default!;
 
     protected override void Resolve(ref CEGOAPSelectorResolveEvent<CEGOAPSelectorRandomEnemy> ev)
     {
@@ -28,7 +30,10 @@ public sealed partial class CEGOAPSelectorRandomEnemySystem : CEGOAPTargetSelect
         var aliveEnemies = new List<EntityUid>();
         foreach (var enemy in cache.Enemies)
         {
-            if (_mobState.IsAlive(enemy))
+            var isAlive = _mobStateQuery.TryGetComponent(enemy, out var mobState)
+                ? _mobState.IsAlive(enemy, mobState)
+                : !Terminating(enemy);
+            if (isAlive)
                 aliveEnemies.Add(enemy);
         }
 

@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using Content.Shared._CE.GOAP;
 using Content.Shared._CE.GOAP.Components;
 using Content.Shared._CE.Health;
@@ -7,6 +7,7 @@ using Content.Shared._CE.ZLevels.Core.Components;
 using Content.Shared._CE.ZLevels.Core.EntitySystems;
 using Content.Shared.Examine;
 using Content.Shared.Maps;
+using Content.Shared.NPC.Components;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Timing;
@@ -47,23 +48,24 @@ public sealed partial class CEGOAPEyesPerceptorComponent : Component
     public TimeSpan NextUpdateTime;
 }
 
-public sealed class CEGOAPEyesPerceptorSystem : EntitySystem
+public sealed partial class CEGOAPEyesPerceptorSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly ITileDefinitionManager _tileDef = default!;
-    [Dependency] private readonly CEGOAPSystem _goap = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly ExamineSystemShared _examine = default!;
-    [Dependency] private readonly CEMobStateSystem _mobState = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly CESharedZLevelsSystem _zLevels = default!;
-    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
+    [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private ITileDefinitionManager _tileDef = default!;
+    [Dependency] private CEGOAPSystem _goap = default!;
+    [Dependency] private SharedTransformSystem _transform = default!;
+    [Dependency] private ExamineSystemShared _examine = default!;
+    [Dependency] private CEMobStateSystem _mobState = default!;
+    [Dependency] private EntityLookupSystem _lookup = default!;
+    [Dependency] private CESharedZLevelsSystem _zLevels = default!;
+    [Dependency] private SharedMapSystem _mapSystem = default!;
 
-    [Dependency] private readonly EntityQuery<TransformComponent> _xformQuery = default!;
-    [Dependency] private readonly EntityQuery<MapGridComponent> _gridQuery = default!;
-    [Dependency] private readonly EntityQuery<MapComponent> _mapQuery = default!;
+    [Dependency] private EntityQuery<TransformComponent> _xformQuery = default!;
+    [Dependency] private EntityQuery<MapGridComponent> _gridQuery = default!;
+    [Dependency] private EntityQuery<MapComponent> _mapQuery = default!;
+    [Dependency] private EntityQuery<CEMobStateComponent> _mobStateQuery = default!;
 
-    private readonly HashSet<Entity<CEMobStateComponent>> _nearbyBuffer = new();
+    private readonly HashSet<Entity<NpcFactionMemberComponent>> _nearbyBuffer = new();
 
     public override void Update(float frameTime)
     {
@@ -90,6 +92,8 @@ public sealed class CEGOAPEyesPerceptorSystem : EntitySystem
         var currentMapUid = xform.MapUid;
 
         // --- Same-map scan (with LOS) ---
+        // Scan all faction members: covers both player mobs (CEMobStateComponent) and CE NPC mobs.
+        // Alive check: players use CEMobStateComponent; NPCs without it are alive while non-terminating.
         _nearbyBuffer.Clear();
         _lookup.GetEntitiesInRange(xform.Coordinates, eyes.VisionRadius, _nearbyBuffer);
 
@@ -99,7 +103,9 @@ public sealed class CEGOAPEyesPerceptorSystem : EntitySystem
             if (targetUid == uid)
                 continue;
 
-            if (!_mobState.IsAlive(targetUid, target.Comp))
+            if (_mobStateQuery.TryGetComponent(targetUid, out var mobState)
+                ? !_mobState.IsAlive(targetUid, mobState)
+                : Terminating(targetUid))
                 continue;
 
             if (!_xformQuery.TryGetComponent(targetUid, out var targetXform))
@@ -140,7 +146,9 @@ public sealed class CEGOAPEyesPerceptorSystem : EntitySystem
                 if (targetUid == uid)
                     continue;
 
-                if (!_mobState.IsAlive(targetUid, target.Comp))
+                if (TryComp<CEMobStateComponent>(targetUid, out var mobState)
+                    ? !_mobState.IsAlive(targetUid, mobState)
+                    : Terminating(targetUid))
                     continue;
 
                 if (!_xformQuery.TryGetComponent(targetUid, out var targetXform))
@@ -185,7 +193,9 @@ public sealed class CEGOAPEyesPerceptorSystem : EntitySystem
                 if (targetUid == uid)
                     continue;
 
-                if (!_mobState.IsAlive(targetUid, target.Comp))
+                if (TryComp<CEMobStateComponent>(targetUid, out var mobState)
+                    ? !_mobState.IsAlive(targetUid, mobState)
+                    : Terminating(targetUid))
                     continue;
 
                 if (!_xformQuery.TryGetComponent(targetUid, out var targetXform))

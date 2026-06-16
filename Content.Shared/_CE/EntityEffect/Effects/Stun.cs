@@ -1,4 +1,4 @@
-using Content.Shared.Stunnable;
+﻿using Content.Shared.Stunnable;
 
 namespace Content.Shared._CE.EntityEffect.Effects;
 
@@ -13,14 +13,15 @@ public sealed partial class Stun : CEEntityEffectBase<Stun>
 
 public sealed partial class CEStunEffectSystem : CEEntityEffectSystem<Stun>
 {
-    [Dependency] private readonly SharedStunSystem _stun = default!;
+    [Dependency] private SharedStunSystem _stun = default!;
 
     protected override void Effect(ref CEEntityEffectEvent<Stun> args)
     {
         if (ResolveEffectEntity(args.Args, args.Effect.EffectTarget) is not { } entity)
             return;
 
-        _stun.TryKnockdown(entity, args.Effect.Duration, drop: args.Effect.DropItems);
-        _stun.TryAddStunDuration(entity, args.Effect.Duration);
+        var duration = args.Effect.Duration * args.Args.Power;
+        _stun.TryKnockdown(entity, duration, drop: args.Effect.DropItems);
+        _stun.TryAddStunDuration(entity, duration);
     }
 }

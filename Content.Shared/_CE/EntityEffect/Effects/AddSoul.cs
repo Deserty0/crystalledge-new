@@ -1,4 +1,4 @@
-using Content.Shared._CE.Soul;
+﻿using Content.Shared._CE.Soul;
 
 namespace Content.Shared._CE.EntityEffect.Effects;
 
@@ -13,13 +13,13 @@ public sealed partial class AddSoul : CEEntityEffectBase<AddSoul>
 
 public sealed partial class CEAddSoulEffectSystem : CEEntityEffectSystem<AddSoul>
 {
-    [Dependency] private readonly CESharedSoulSystem _souls = default!;
+    [Dependency] private CESharedSoulSystem _souls = default!;
 
     protected override void Effect(ref CEEntityEffectEvent<AddSoul> args)
     {
         if (ResolveEffectEntity(args.Args, args.Effect.EffectTarget) is not { } entity)
             return;
 
-        _souls.TryAddSouls(entity, args.Effect.Amount);
+        _souls.TryAddSouls(entity, (int)(args.Effect.Amount * args.Args.Power));
     }
 }
