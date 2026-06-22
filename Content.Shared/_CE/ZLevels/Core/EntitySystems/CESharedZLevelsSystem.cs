@@ -25,6 +25,7 @@ public abstract partial class CESharedZLevelsSystem : EntitySystem
     [Dependency] private INetManager _net = null!;
     [Dependency] private IGameTiming _timing = null!;
     [Dependency] private IConfigurationManager _config = null!;
+    [Dependency] private IMapManager _mapManager = null!;
 
     [Dependency] private SharedPhysicsSystem _physicsSystem = null!;
     [Dependency] private SharedTransformSystem _transform = null!;
@@ -65,35 +66,6 @@ public abstract partial class CESharedZLevelsSystem : EntitySystem
         InitializeView();
     }
 
-    public bool IsVoidAtCoordinates(EntityCoordinates coords, out Entity<CEZLevelMapComponent> belowMap)
-    {
-        belowMap = default;
-
-        var mapId = _transform.GetMapId(coords);
-        if (mapId == MapId.Nullspace)
-            return false;
-
-        var mapUid = _map.GetMap(mapId);
-
-        if (!_zMapQuery.TryComp(mapUid, out var zMap))
-            return false;
-
-        if (!TryMapDown((mapUid, zMap), out belowMap))
-            return false;
-
-        // No grid means empty space.
-        if (!_gridQuery.TryComp(mapUid, out var grid))
-            return true;
-
-        var indices = _map.LocalToTile(mapUid, grid, coords);
-
-        // Avoid unnecessary temp variables.
-        return _map
-            .GetTileRef(mapUid, grid, indices)
-            .Tile
-            .IsEmpty;
-    }
-
     /// <summary>
     /// Checks whether the map is in the zLevels network. If so, returns true and the current depth + Entity of the current zLevels network.
     /// </summary>
@@ -118,6 +90,23 @@ public abstract partial class CESharedZLevelsSystem : EntitySystem
         }
 
         zLevel = (networkUid, zNetworkComponent);
+        return true;
+    }
+
+    /// <summary>
+    /// Returns the inclusive depth range of the z-network the given map belongs to
+    /// (<c>minDepth</c>..<c>maxDepth</c>). False if the map is not in a z-network.
+    /// </summary>
+    [PublicAPI]
+    public bool TryGetDepthBounds(EntityUid mapUid, out int minDepth, out int maxDepth)
+    {
+        minDepth = 0;
+        maxDepth = 0;
+        if (!TryGetZNetwork(mapUid, out var network))
+            return false;
+
+        minDepth = network.Comp.SortedMin;
+        maxDepth = network.Comp.SortedMax;
         return true;
     }
 
