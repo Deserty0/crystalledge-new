@@ -97,6 +97,11 @@ public sealed class CEProceduralDungeonJob(
         await generator.SpawnRooms(comp, mapUid, grid, reservedTiles, SuspendIfOutOfTime);
         await SuspendIfOutOfTime();
 
+        // Snapshot room-only tiles before corridors are added.
+        // PlaceWalls uses this to compute correct border walls on non-main z-levels,
+        // where corridors don't exist and must not suppress wall placement.
+        var roomOnlyTiles = new HashSet<Vector2i>(reservedTiles);
+
         // Resolve the grid at MainZLevel for corridor placement.
         var corridorGridUid = mapUid;
         var corridorGrid = grid;
@@ -125,7 +130,7 @@ public sealed class CEProceduralDungeonJob(
         await SuspendIfOutOfTime();
 
         // Place walls around the perimeter of all rooms and corridors on every z-level.
-        await generator.PlaceWalls(config, mapUid, mapsByDepth, reservedTiles, SuspendIfOutOfTime);
+        await generator.PlaceWalls(config, mapUid, mapsByDepth, reservedTiles, roomOnlyTiles, corridorGridUid, SuspendIfOutOfTime);
         await SuspendIfOutOfTime();
 
         entManager.Dirty(mapUid, comp);

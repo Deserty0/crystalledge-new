@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is sublicensed under MIT License
  * https://github.com/space-wizards/space-station-14/blob/master/LICENSE.TXT
  */
@@ -8,8 +8,12 @@ using Content.Client._CE.ZLevels.Core.Overlays;
 using Content.Shared._CE.ZLevels.Core.Components;
 using Content.Shared._CE.ZLevels.Core.EntitySystems;
 using Content.Shared.Camera;
+using Content.Shared.StatusEffectNew.Components;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
+using Robust.Shared.GameObjects;
+using Robust.Shared.Map.Components;
+using Robust.Shared.Maths;
 
 namespace Content.Client._CE.ZLevels.Core;
 
@@ -18,8 +22,8 @@ namespace Content.Client._CE.ZLevels.Core;
 /// </summary>
 public sealed partial class CEClientZLevelsSystem : CESharedZLevelsSystem
 {
-    [Dependency] private readonly IOverlayManager _overlay = default!;
-    [Dependency] private readonly IEyeManager _eye = default!;
+    [Dependency] private IOverlayManager _overlay = default!;
+    [Dependency] private IEyeManager _eye = default!;
 
     public override void Initialize()
     {
@@ -46,7 +50,6 @@ public sealed partial class CEClientZLevelsSystem : CESharedZLevelsSystem
         if (sprite.SnapCardinals)
             return;
 
-        ent.Comp.NoRotDefault = sprite.NoRotation;
         ent.Comp.DrawDepthDefault = sprite.DrawDepth;
         ent.Comp.SpriteOffsetDefault = sprite.Offset;
     }
@@ -65,9 +68,11 @@ public sealed partial class CEClientZLevelsSystem : CESharedZLevelsSystem
 /// This prevents Z from accumulating across frames when no animation writes to the offset
 /// (e.g. entities that only animate scale, like SlimeIceBig).
 /// </summary>
-internal sealed class CEClientZLevelsPreAnimSystem : EntitySystem
+internal sealed partial class CEClientZLevelsPreAnimSystem : EntitySystem
 {
-    [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private SpriteSystem _sprite = default!;
+    [Dependency] private EntityQuery<MapGridComponent> _mapGridQuery = default!;
+    [Dependency] private EntityQuery<CEZPhysicsComponent> _zPhysQuery = default!;
 
     public override void Initialize()
     {
@@ -83,9 +88,21 @@ internal sealed class CEClientZLevelsPreAnimSystem : EntitySystem
         while (query.MoveNext(out var uid, out var zPhys, out var sprite))
         {
             var localPosition = zPhys.LocalPosition;
-            sprite.NoRotation = localPosition != 0 || zPhys.NoRotDefault;
             _sprite.SetOffset((uid, sprite), zPhys.SpriteOffsetDefault);
             _sprite.SetDrawDepth((uid, sprite), localPosition > 0 ? (int)Shared.DrawDepth.DrawDepth.OverMobs : zPhys.DrawDepthDefault);
+        }
+
+        // Set parent-synced status effect offsets to the parent's current Z value each frame — prevents accumulation.
+        var syncQuery = EntityQueryEnumerator<StatusEffectComponent, SpriteComponent, TransformComponent>();
+        while (syncQuery.MoveNext(out var uid, out _, out var sprite, out var xform))
+        {
+            var parent = xform.ParentUid;
+            if (_mapGridQuery.HasComp(parent))
+                continue;
+            if (!_zPhysQuery.TryComp(parent, out var parentZPhys))
+                continue;
+            var zOffset = new Vector2(0, parentZPhys.LocalPosition * CESharedZLevelsSystem.ZLevelOffset);
+            _sprite.SetOffset((uid, sprite), zOffset);
         }
     }
 }
@@ -97,9 +114,10 @@ internal sealed class CEClientZLevelsPreAnimSystem : EntitySystem
 /// (loop animation, one-shot swing, idle bob, etc.) is preserved, and the Z-height contribution
 /// is simply added on top.  No animation code needs to know about Z levels.
 /// </summary>
-internal sealed class CEClientZLevelsPostAnimSystem : EntitySystem
+internal sealed partial class CEClientZLevelsPostAnimSystem : EntitySystem
 {
-    [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private SpriteSystem _sprite = default!;
+    [Dependency] private SharedTransformSystem _xform = default!;
 
     public override void Initialize()
     {
@@ -111,10 +129,17 @@ internal sealed class CEClientZLevelsPostAnimSystem : EntitySystem
     {
         // Phase 2: add the Z-height contribution on top of the animation-player's output.
         // At this point sprite.Offset == animationValue (or SpriteOffsetDefault if no anim ran).
-        var query = EntityQueryEnumerator<CEZPhysicsComponent, SpriteComponent>();
-        while (query.MoveNext(out var uid, out var zPhys, out var sprite))
+        // The offset is counter-rotated by the entity's world angle so it always points world-up,
+        // preventing it from orbiting the pivot when the entity has angular velocity (e.g. shurikens).
+        var query = EntityQueryEnumerator<CEZPhysicsComponent, SpriteComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out var zPhys, out var sprite, out var xform))
         {
-            var zOffset = new Vector2(0, zPhys.LocalPosition * CESharedZLevelsSystem.ZLevelOffset);
+            var rawZ = new Vector2(0, zPhys.LocalPosition * CESharedZLevelsSystem.ZLevelOffset);
+            Vector2 zOffset;
+            if (sprite.NoRotation)
+                zOffset = rawZ;
+            else
+                zOffset = new Angle(-_xform.GetWorldRotation(xform)).RotateVec(rawZ);
             _sprite.SetOffset((uid, sprite), sprite.Offset + zOffset);
         }
     }

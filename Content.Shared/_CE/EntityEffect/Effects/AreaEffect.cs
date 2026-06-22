@@ -1,4 +1,4 @@
-using Content.Shared.Examine;
+﻿using Content.Shared.Examine;
 using Content.Shared.Whitelist;
 
 namespace Content.Shared._CE.EntityEffect.Effects;
@@ -35,10 +35,10 @@ public sealed partial class AreaEffect : CEEntityEffectBase<AreaEffect>
 
 public sealed partial class CEAreaEffectEffectSystem : CEEntityEffectSystem<AreaEffect>
 {
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly ExamineSystemShared _examine = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSys = default!;
+    [Dependency] private EntityLookupSystem _lookup = default!;
+    [Dependency] private EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private ExamineSystemShared _examine = default!;
+    [Dependency] private SharedTransformSystem _transformSys = default!;
 
     protected override void Effect(ref CEEntityEffectEvent<AreaEffect> args)
     {
@@ -46,7 +46,8 @@ public sealed partial class CEAreaEffectEffectSystem : CEEntityEffectSystem<Area
             return;
 
         var mapCenter = _transformSys.ToMapCoordinates(targetPoint);
-        var entitiesAround = _lookup.GetEntitiesInRange(targetPoint, args.Effect.Range, LookupFlags.Uncontained);
+        var scaledRange = args.Effect.Range * args.Args.Power;
+        var entitiesAround = _lookup.GetEntitiesInRange(targetPoint, scaledRange, LookupFlags.Uncontained);
 
         var count = 0;
         foreach (var entity in entitiesAround)
@@ -60,7 +61,7 @@ public sealed partial class CEAreaEffectEffectSystem : CEEntityEffectSystem<Area
             if (args.Effect.CheckLOS)
             {
                 var entityMapPos = _transformSys.GetMapCoordinates(entity);
-                if (!_examine.InRangeUnOccluded(mapCenter, entityMapPos, args.Effect.Range, null))
+                if (!_examine.InRangeUnOccluded(mapCenter, entityMapPos, scaledRange, null))
                     continue;
             }
 

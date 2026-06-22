@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is sublicensed under MIT License
  * https://github.com/space-wizards/space-station-14/blob/master/LICENSE.TXT
  */
@@ -17,11 +17,11 @@ namespace Content.Server._CE.ZLevels.Core;
 
 public sealed partial class CEZLevelsSystem : CESharedZLevelsSystem
 {
-    [Dependency] private readonly MapSystem _map = default!;
-    [Dependency] private readonly MapLoaderSystem _mapLoader = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly MetaDataSystem _meta = default!;
-    [Dependency] private readonly StationSystem _station = default!;
+    [Dependency] private MapSystem _map = default!;
+    [Dependency] private MapLoaderSystem _mapLoader = default!;
+    [Dependency] private TransformSystem _transform = default!;
+    [Dependency] private MetaDataSystem _meta = default!;
+    [Dependency] private StationSystem _station = default!;
 
     public override void Initialize()
     {
@@ -44,13 +44,16 @@ public sealed partial class CEZLevelsSystem : CESharedZLevelsSystem
 
         _meta.SetEntityName(ent.Comp.ZNetworkEntity.Value, $"Station z-Network: {stationName}");
 
-        var mainMap =  _station.GetLargestGrid(ent.Owner);
-        if (mainMap is null)
+        var mainGrid = _station.GetLargestGrid(ent.Owner);
+        if (mainGrid is null)
             throw new Exception("Station has no grids to base z-levels off of!");
+
+        var mainMapEnt = Transform(mainGrid.Value).MapUid
+            ?? throw new Exception("Station main grid has no parent map entity!");
 
         var dict = new Dictionary<EntityUid, int>()
         {
-            { mainMap.Value, 0 }
+            { mainMapEnt, 0 }
         };
 
         // Loading maps below first
@@ -66,7 +69,8 @@ public sealed partial class CEZLevelsSystem : CESharedZLevelsSystem
             Log.Info($"Created map {mapEnt.Value.Comp.MapId} for Station zNetwork at level {depth}");
             _map.InitializeMap(mapEnt.Value.Comp.MapId);
             _meta.SetEntityName(mapEnt.Value, $"{stationName} [{depth}]");
-            _station.AddGridToStation(ent, mapEnt.Value);
+            if (_mapGridQuery.HasComp(mapEnt.Value)) //Adding zlevel map to station, if it is planetmap
+                _station.AddGridToStation(ent, mapEnt.Value);
             dict.Add(mapEnt.Value, depth);
             depth++;
         }
@@ -84,7 +88,8 @@ public sealed partial class CEZLevelsSystem : CESharedZLevelsSystem
             Log.Info($"Created map {mapEnt.Value.Comp.MapId} for Station zNetwork at level {depth}");
             _map.InitializeMap(mapEnt.Value.Comp.MapId);
             _meta.SetEntityName(mapEnt.Value, $"{stationName} [{depth}]");
-            _station.AddGridToStation(ent, mapEnt.Value);
+            if (_mapGridQuery.HasComp(mapEnt.Value)) //Adding zlevel map to station, if it is planetmap
+                _station.AddGridToStation(ent, mapEnt.Value);
             dict.Add(mapEnt.Value, depth);
             depth++;
         }

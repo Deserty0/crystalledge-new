@@ -1,5 +1,7 @@
 using Content.Shared._CE.EntityEffect;
 using Content.Shared._CE.TileEffects.Core;
+using Robust.Shared.Physics;
+using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Events;
 
 namespace Content.Server._CE.EntityEffect;
@@ -17,10 +19,15 @@ public sealed class CEEntityEffectOnCollideSystem : EntitySystem
         if (args.OurFixtureId != ent.Comp.TriggerFixtureId)
             return;
 
+        if (!ent.Comp.AffectAirborne
+            && TryComp<PhysicsComponent>(args.OtherEntity, out var otherPhysics)
+            && otherPhysics.BodyStatus == BodyStatus.InAir)
+            return;
+
         EntityUid source = ent;
 
-        if (TryComp<CETileEffectComponent>(ent, out var tileEffect) && tileEffect.Applier != null)
-            source = tileEffect.Applier.Value;
+        if (TryComp<CETileEffectComponent>(ent, out var tileEffect) && tileEffect.Source != null)
+            source = tileEffect.Source.Value;
 
 
         foreach (var effect in ent.Comp.Effects)

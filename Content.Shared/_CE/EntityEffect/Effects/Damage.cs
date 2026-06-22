@@ -1,4 +1,4 @@
-using Content.Shared._CE.Health;
+﻿using Content.Shared._CE.Health;
 
 namespace Content.Shared._CE.EntityEffect.Effects;
 
@@ -24,14 +24,14 @@ public sealed partial class Damage : CEEntityEffectBase<Damage>
 
 public sealed partial class CEDamageEffectSystem : CEEntityEffectSystem<Damage>
 {
-    [Dependency] private readonly CESharedDamageableSystem _health = default!;
+    [Dependency] private CESharedDamageableSystem _health = default!;
 
     protected override void Effect(ref CEEntityEffectEvent<Damage> args)
     {
         if (ResolveEffectEntity(args.Args, args.Effect.EffectTarget) is not { } entity)
             return;
 
-        var damage = new CEDamageSpecifier(args.Effect.DamageSpec);
+        var damage = new CEDamageSpecifier(args.Effect.DamageSpec) * args.Args.Power;
 
         _health.TakeDamage(
             entity,

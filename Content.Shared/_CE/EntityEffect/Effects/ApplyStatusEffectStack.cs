@@ -1,4 +1,4 @@
-using Content.Shared._CE.StatusEffects.Core;
+﻿using Content.Shared._CE.StatusEffects.Core;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._CE.EntityEffect.Effects;
@@ -31,14 +31,14 @@ public sealed partial class ApplyStatusEffectStack : CEEntityEffectBase<ApplySta
 
 public sealed partial class CEApplyStatusEffectStackEffectSystem : CEEntityEffectSystem<ApplyStatusEffectStack>
 {
-    [Dependency] private readonly CEStatusEffectStackSystem _effectStack = default!;
+    [Dependency] private CEStatusEffectStackSystem _effectStack = default!;
 
     protected override void Effect(ref CEEntityEffectEvent<ApplyStatusEffectStack> args)
     {
         if (ResolveEffectEntity(args.Args, args.Effect.EffectTarget) is not { } entity)
             return;
 
-        _effectStack.TryAddStack(entity, args.Effect.StatusEffect, out _, args.Effect.Amount, source: args.Args.Source, max: args.Effect.Max, used: args.Args.Used, suppressEvents: args.Effect.SuppressEvents);
+        _effectStack.TryAddStack(entity, args.Effect.StatusEffect, out _, (int)(args.Effect.Amount * args.Args.Power), source: args.Args.Source, max: args.Effect.Max, used: args.Args.Used, suppressEvents: args.Effect.SuppressEvents);
     }
 }
 

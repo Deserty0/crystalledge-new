@@ -1,4 +1,4 @@
-using Content.Shared._CE.StatusEffects.Core;
+﻿using Content.Shared._CE.StatusEffects.Core;
 using Content.Shared._CE.TileEffects.Core;
 using Content.Shared.Whitelist;
 using Robust.Shared.Network;
@@ -7,9 +7,9 @@ namespace Content.Shared._CE.TileEffects.ContactEffect;
 
 public sealed partial class CETileEffectContactEffectsSystem : EntitySystem
 {
-    [Dependency] private readonly CEStatusEffectStackSystem _stack = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private CEStatusEffectStackSystem _stack = default!;
+    [Dependency] private EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private INetManager _net = default!;
 
     public override void Initialize()
     {
@@ -38,7 +38,7 @@ public sealed partial class CETileEffectContactEffectsSystem : EntitySystem
             if (stacks <= 0)
                 continue;
 
-            _stack.TryAddStack(other, effectId, out _, stacks, source: tileComp.Applier, max: stacks);
+            _stack.TryAddStack(other, effectId, out _, stacks, source: tileComp.Source, max: stacks);
         }
     }
 }

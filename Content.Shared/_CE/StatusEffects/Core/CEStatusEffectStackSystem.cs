@@ -1,4 +1,4 @@
-using Content.Shared._CE.EntityEffect.Effects;
+﻿using Content.Shared._CE.EntityEffect.Effects;
 using Content.Shared._CE.StatusEffects.Core.Components;
 using Content.Shared._CE.StatusEffectStacks;
 using Content.Shared.Alert;
@@ -12,13 +12,13 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._CE.StatusEffects.Core;
 
-public sealed class CEStatusEffectStackSystem : EntitySystem
+public sealed partial class CEStatusEffectStackSystem : EntitySystem
 {
-    [Dependency] private readonly StatusEffectsSystem _statusEffect = default!;
-    [Dependency] private readonly AlertsSystem _alerts = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private StatusEffectsSystem _statusEffect = default!;
+    [Dependency] private AlertsSystem _alerts = default!;
+    [Dependency] private SharedAppearanceSystem _appearance = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private INetManager _net = default!;
 
     public override void Initialize()
     {
@@ -207,7 +207,7 @@ public sealed class CEStatusEffectStackSystem : EntitySystem
     /// </summary>
     public EntityUid? GetSource(Entity<CEStatusEffectSourceComponent?> effectEntity)
     {
-        if (!Resolve(effectEntity, ref effectEntity.Comp))
+        if (!Resolve(effectEntity, ref effectEntity.Comp, false))
             return null;
 
         if (effectEntity.Comp.Source is { } src && Exists(src))
@@ -252,6 +252,10 @@ public sealed class CEStatusEffectStackSystem : EntitySystem
         if (!TryComp<CEStatusEffectStackComponent>(statusEnt.Value, out var stackComp))
             return false;
 
+        var source = GetSource(statusEnt.Value);
+        if (source is { } src)
+            RaiseLocalEvent(src, new CEAfterRemoveStatusEffectEvent(target, statusEffect));
+
         if (stackComp.Stacks <= stack)
         {
             _statusEffect.TryRemoveStatusEffect(target, statusEffect);
@@ -284,6 +288,10 @@ public sealed class CEStatusEffectStackSystem : EntitySystem
 
         if (proto is null)
             return false;
+
+        var source = GetSource(effect.Owner);
+        if (source is { } src)
+            RaiseLocalEvent(src, new CEAfterRemoveStatusEffectEvent(statusEffect.AppliedTo.Value, new EntProtoId(proto.ID)));
 
         if (effect.Comp.Stacks <= stack)
         {
@@ -486,7 +494,7 @@ public enum CEStatusEffectStackPowerVisuals
 /// Cancelling prevents the stacks from being applied.
 /// Relayed to the source's active status effects via <c>StatusEffectRelayedEvent</c>.
 /// </summary>
-public sealed class CEAttemptApplyStatusEffectStackEvent(
+public sealed partial class CEAttemptApplyStatusEffectStackEvent(
     EntityUid target,
     EntProtoId statusEffect,
     int amount) : EntityEventArgs
@@ -502,7 +510,7 @@ public sealed class CEAttemptApplyStatusEffectStackEvent(
 /// Cancelling prevents the stacks from being applied.
 /// Relayed to the target's active status effects via <c>StatusEffectRelayedEvent</c>.
 /// </summary>
-public sealed class CEAttemptReceiveStatusEffectStackEvent(
+public sealed partial class CEAttemptReceiveStatusEffectStackEvent(
     EntityUid target,
     EntProtoId statusEffect,
     int amount,

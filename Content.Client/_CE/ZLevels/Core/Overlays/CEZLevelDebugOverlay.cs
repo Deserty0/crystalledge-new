@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is sublicensed under MIT License
  * https://github.com/space-wizards/space-station-14/blob/master/LICENSE.TXT
  */
@@ -13,10 +13,10 @@ using Robust.Shared.Enums;
 
 namespace Content.Client._CE.ZLevels.Core.Overlays;
 
-public sealed class CEZLevelDebugOverlay : Overlay
+public sealed partial class CEZLevelDebugOverlay : Overlay
 {
-    [Dependency] private readonly IEntityManager _entityManager = null!;
-    [Dependency] private readonly IResourceCache _cache = null!;
+    [Dependency] private IEntityManager _entityManager = null!;
+    [Dependency] private IResourceCache _cache = null!;
 
     private readonly CESharedZLevelsSystem _zLevels;
     private readonly SharedTransformSystem _transform;
@@ -43,10 +43,27 @@ public sealed class CEZLevelDebugOverlay : Overlay
                 !_entityManager.TryGetComponent<TransformComponent>(uid, out var xform))
                 continue;
 
-            if (xform.MapUid != xform.ParentUid)
+            if (xform.GridUid != xform.ParentUid)
                 continue;
 
             DrawEntityDebug(args, uid, zPhys);
+        }
+
+        var gridQuery = _entityManager.EntityQueryEnumerator<CEZGridComponent, TransformComponent>();
+        while (gridQuery.MoveNext(out _, out var gridNet, out var gridXform))
+        {
+            if (gridNet.NetworkId == string.Empty)
+                continue;
+
+            var gridWorldPos = _transform.GetWorldPosition(gridXform);
+            var gridScreenPos = args.ViewportControl?.WorldToScreen(gridWorldPos) ?? Vector2.Zero;
+            if (gridScreenPos == Vector2.Zero)
+                continue;
+
+            var shortId = gridNet.NetworkId.Length >= 8
+                ? gridNet.NetworkId[..8]
+                : gridNet.NetworkId;
+            args.ScreenHandle.DrawString(_font, gridScreenPos, $"Net: {shortId}", Color.Cyan);
         }
     }
 
@@ -71,9 +88,9 @@ public sealed class CEZLevelDebugOverlay : Overlay
     }
 }
 
-public sealed class CEShowZLevelDebugCommand : LocalizedCommands
+public sealed partial class CEShowZLevelDebugCommand : LocalizedCommands
 {
-    [Dependency] private readonly IOverlayManager _overlayManager = null!;
+    [Dependency] private IOverlayManager _overlayManager = null!;
 
     public override string Command => "showzleveldebug";
 

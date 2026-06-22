@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Content.Shared._CE.Health.Components;
 using Content.Shared._CE.TileEffects.EffectTransform;
 using Content.Shared.Examine;
@@ -16,18 +16,18 @@ namespace Content.Shared._CE.TileEffects.Core;
 
 public sealed partial class CETileEffectSystem : EntitySystem
 {
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly IComponentFactory _compFactory = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly IPrototypeManager _protoManager = default!;
-    [Dependency] private readonly ExamineSystemShared _examine = default!;
+    [Dependency] private SharedTransformSystem _transform = default!;
+    [Dependency] private SharedAppearanceSystem _appearance = default!;
+    [Dependency] private SharedMapSystem _mapSystem = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private EntityLookupSystem _lookup = default!;
+    [Dependency] private IComponentFactory _compFactory = default!;
+    [Dependency] private IMapManager _mapManager = default!;
+    [Dependency] private INetManager _net = default!;
+    [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private IRobustRandom _random = default!;
+    [Dependency] private IPrototypeManager _protoManager = default!;
+    [Dependency] private ExamineSystemShared _examine = default!;
 
     private EntityQuery<CETileEffectComponent> _tileQuery;
 
@@ -339,7 +339,7 @@ public sealed partial class CETileEffectSystem : EntitySystem
             {
                 SetStacks((combined, combinedTileComp), selfStacks + amount, max);
                 if (source is not null)
-                    combinedTileComp.Applier = source;
+                    combinedTileComp.Source = source;
             }
 
             return true;
@@ -357,7 +357,7 @@ public sealed partial class CETileEffectSystem : EntitySystem
 
             TryAddStack((ent, existing), amount, max);
             if (source is not null)
-                existing.Applier = source;
+                existing.Source = source;
 
             return true;
         }
@@ -368,7 +368,7 @@ public sealed partial class CETileEffectSystem : EntitySystem
             return false;
 
         if (source is not null)
-            comp.Applier = source;
+            comp.Source = source;
 
         // Use SetStacks so the initial count equals `amount`, not the prototype default + amount.
         SetStacks((spawned, comp), amount, max);

@@ -1,4 +1,4 @@
-- type: entity
+﻿- type: entity
   parent: MarkerBase
   id: CEMobBossSlimeSpawner
   name: Giant crystal slime Spawner
@@ -117,30 +117,28 @@
       cost: 1
       exploreRadius: 8
   - type: CEGOAPRangeToTargetSensor
-    conditionKey: EnemyInMeleeRange
-    selector: !type:CEGOAPSelectorNearestEnemy
-    range: 2.5
+    entries:
+    - conditionKey: EnemyInMeleeRange
+      selector: !type:CEGOAPSelectorNearestEnemy
+      range: 2.5
 
   - type: MovementSpeedModifier
     baseSprintSpeed: 2
-  - type: CEPermanentStatusEffects
-    effects:
-    - CEStatusEffectGiantCrystalSlime
-
-- type: entity
-  id: CEStatusEffectGiantCrystalSlime
-  components:
-  - type: StatusEffect
-  - type: CEArmor
-    flat:
-      Cold: 3
-      Physical: 3
-      Fire: 3
-  - type: CEStatusEffectImmunity
-    blockedEffects:
-    - CEStatusEffectColdSlowdown
-    - CEStatusEffectWet
-    - CEStatusEffectFrozen
+  - type: CEInnateStatusEffect
+    components:
+    - type: CEArmor
+      flat:
+        Cold: 3
+        Physical: 3
+        Fire: 3
+    - type: CEStatusEffectImmunity
+      blockedEffects:
+      - CEStatusEffectColdSlowdown
+      - CEStatusEffectWet
+      - CEStatusEffectFrozen
+    - type: CEFallingImmunityStatusEffect
+      stunMultiplier: 0
+      damageMultiplier: 0
 
 
 - type: entityEffectAnimation
@@ -403,7 +401,7 @@
       radius: 3
       maxStacks: 5
     - !type:WeaponArcAttack
-      range: 1.3
+      rangeMultiplier: 2.6
       arcWidth: 360
       effects:
       - !type:Damage
@@ -411,7 +409,7 @@
         damage:
           types:
             Physical: 15
-      - !type:ThrowFromUser
+      - !type:ThrowFrom
         distance: 1
     - !type:ShockWaveVFX
       width: 0.05
@@ -511,7 +509,7 @@
       radius: 3
       maxStacks: 5
     - !type:WeaponArcAttack
-      range: 1.3
+      rangeMultiplier: 2.6
       arcWidth: 360
       effects:
       - !type:Damage
@@ -519,7 +517,7 @@
         damage:
           types:
             Physical: 25
-      - !type:ThrowFromUser
+      - !type:ThrowFrom
         distance: 1
     - !type:ShockWaveVFX
       width: 0.5

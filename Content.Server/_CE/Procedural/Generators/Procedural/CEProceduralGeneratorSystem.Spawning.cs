@@ -23,22 +23,28 @@ public sealed partial class CEProceduralGeneratorSystem
     /// <summary>
     /// Places wall entities around the perimeter of all reserved (occupied) tiles.
     /// A wall is placed at every neighbouring position (8-directional, including diagonals)
-    /// that is not itself a reserved tile. Walls are spawned on every z-level in the network.
+    /// that is not itself a reserved tile.
+    /// <para>
+    /// Corridors only exist on the main z-level, so wall positions are computed separately
+    /// for that level (rooms + corridors) and for all other levels (rooms only). This prevents
+    /// holes in the border walls on non-main levels at positions where the main level has a
+    /// corridor passage.
+    /// </para>
     /// </summary>
     internal async Task PlaceWalls(
         CEProceduralConfig config,
         EntityUid baseMapUid,
         Dictionary<EntityUid, int> mapsByDepth,
         HashSet<Vector2i> reservedTiles,
+        HashSet<Vector2i> roomOnlyTiles,
+        EntityUid mainLevelMapUid,
         Func<ValueTask> suspend)
     {
-        // Compute wall positions: neighbours of reserved tiles that are not occupied.
-        var wallPositions = new HashSet<Vector2i>();
-
+        // Wall positions for the main level: perimeter of rooms + corridors.
+        var wallPositionsMain = new HashSet<Vector2i>();
         var computeCounter = 0;
         foreach (var tile in reservedTiles)
         {
-            // Yield periodically during wall position computation.
             if (++computeCounter % 500 == 0)
                 await suspend();
 
@@ -46,17 +52,36 @@ public sealed partial class CEProceduralGeneratorSystem
             {
                 var neighbor = tile + offset;
                 if (!reservedTiles.Contains(neighbor))
-                    wallPositions.Add(neighbor);
+                    wallPositionsMain.Add(neighbor);
             }
         }
 
-        if (wallPositions.Count == 0)
+        // Wall positions for non-main levels: perimeter of rooms only.
+        // Corridors don't exist on those levels, so corridor tile positions must not be
+        // treated as "reserved" — otherwise the border wall at the passage opening is skipped.
+        var wallPositionsOther = new HashSet<Vector2i>();
+        foreach (var tile in roomOnlyTiles)
+        {
+            if (++computeCounter % 500 == 0)
+                await suspend();
+
+            foreach (var offset in AllNeighbors)
+            {
+                var neighbor = tile + offset;
+                if (!roomOnlyTiles.Contains(neighbor))
+                    wallPositionsOther.Add(neighbor);
+            }
+        }
+
+        if (wallPositionsMain.Count == 0 && wallPositionsOther.Count == 0)
             return;
 
-        // Spawn walls on every z-level.
+        // Spawn walls on every z-level using the appropriate position set.
         var wallCounter = 0;
         foreach (var (levelMapUid, _) in mapsByDepth)
         {
+            var wallPositions = levelMapUid == mainLevelMapUid ? wallPositionsMain : wallPositionsOther;
+
             foreach (var pos in wallPositions)
             {
                 // Yield every 20 wall spawns — entity creation is expensive.
